@@ -1,0 +1,10 @@
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\bin\Debug\Auto_M.exe.config
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\bin\Debug\Auto_M.exe
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\bin\Debug\Auto_M.pdb
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.csprojAssemblyReference.cache
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.Auto_M.resources
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.Properties.Resources.resources
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.csproj.GenerateResource.cache
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.csproj.CoreCompileInputs.cache
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.exe
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.pdb
