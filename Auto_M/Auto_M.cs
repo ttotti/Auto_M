@@ -49,9 +49,17 @@ namespace Auto_M
         public const uint LBUTTONUP = 0x0004;
 
         // 마우스 좌표
-        Point main_point;
-        Point num1_point;
-        Point num2_point;
+        // 좌표에 대한 이름을 저장하기 위해 따로 구조체를 정의하였다
+        public struct Pos
+        {
+            public string name { get; set; }
+            public Point point;
+        }
+
+        Pos main_point;
+        Pos origin_point;
+        Pos num1_point;
+        Pos num2_point;
 
         // 오토마우스가 실행되고 있는가
         bool isStart = false;
@@ -73,6 +81,9 @@ namespace Auto_M
 
                         log_Label.Text = "오토마우스가 실행되었습니다!";
 
+                        // 원래 있던 마우스 좌표로 이동하기 위해 저장
+                        origin_point = main_point;
+
                         timer2.Start();
                     }
                     else
@@ -82,24 +93,27 @@ namespace Auto_M
                         log_Label.Text = "오토마우스가 종료되었습니다!";
 
                         timer2.Stop();
+
+                        // 원래 있던 좌표로 이동
+                        SetCursorPos(origin_point.point.X, origin_point.point.Y);
                     }
                 }
                 // 눌러진 키의 ID가 1이면
                 else if (m.WParam == (IntPtr)0x1)
                 {
-                    if (num1_point.X == 0 && num1_point.Y == 0)
+                    if (num1_point.point.X == 0 && num1_point.point.Y == 0)
                     {
                         num1_point = main_point;
-                        num1_X_pos.Text = num1_point.X.ToString();
-                        num1_Y_pos.Text = num1_point.Y.ToString();
+                        num1_X_pos.Text = num1_point.point.X.ToString();
+                        num1_Y_pos.Text = num1_point.point.Y.ToString();
 
                         log_Label.Text = "첫 번째 좌표가 저장되었습니다!";
                     }
-                    else if (num2_point.X == 0 && num2_point.Y == 0)
+                    else if (num2_point.point.X == 0 && num2_point.point.Y == 0)
                     {
                         num2_point = main_point;
-                        num2_X_pos.Text = num2_point.X.ToString();
-                        num2_Y_pos.Text = num2_point.Y.ToString();
+                        num2_X_pos.Text = num2_point.point.X.ToString();
+                        num2_Y_pos.Text = num2_point.point.Y.ToString();
 
                         log_Label.Text = "두 번째 좌표가 저장되었습니다!";
                     }
@@ -107,17 +121,17 @@ namespace Auto_M
                 // 눌러진 키의 ID가 2이면
                 else if (m.WParam == (IntPtr)0x2)
                 {
-                    num1_point.X = 0;
-                    num1_point.Y = 0;
+                    num1_point.point.X = 0;
+                    num1_point.point.Y = 0;
 
-                    num1_X_pos.Text = num1_point.X.ToString();
-                    num1_Y_pos.Text = num1_point.Y.ToString();
+                    num1_X_pos.Text = num1_point.point.X.ToString();
+                    num1_Y_pos.Text = num1_point.point.Y.ToString();
 
-                    num2_point.X = 0;
-                    num2_point.Y = 0;
+                    num2_point.point.X = 0;
+                    num2_point.point.Y = 0;
 
-                    num2_X_pos.Text = num2_point.X.ToString();
-                    num2_Y_pos.Text = num2_point.Y.ToString();
+                    num2_X_pos.Text = num2_point.point.X.ToString();
+                    num2_Y_pos.Text = num2_point.point.Y.ToString();
 
                     log_Label.Text = "모든 좌표가 초기화되었습니다!";
                 }
@@ -127,25 +141,26 @@ namespace Auto_M
         public Auto_M()
         {
             InitializeComponent();
-
-            main_point.X = 0;
-            main_point.Y = 0;
-
-            num1_point.X = 0;
-            num1_point.Y = 0;
-
-            num2_point.X = 0;
-            num2_point.Y = 0;
         }
 
         private void Auto_M_Load(object sender, EventArgs e)
         {
+            main_point.point.X = 0;
+            main_point.point.Y = 0;
+
+            num1_point.point.X = 0;
+            num1_point.point.Y = 0;
+
+            num2_point.point.X = 0;
+            num2_point.point.Y = 0;
+
             // 핫키를 등록
             // RegisterHotkey(핫키를 입력받을 핸들, id 값, modifer 라고 불리우는 키값(ctrl, alt, shift, winkey 등 조합키, 어떤 키를 누를지)
             // 조합키 - 0x0: 조합키안씀  |  0x1: alt  | 0x2: ctrl  |  0x3: shift
             RegisterHotKey(this.Handle, 0, 0x0, (int)Keys.F4);
             RegisterHotKey(this.Handle, 1, 0x0, (int)Keys.F3);
             RegisterHotKey(this.Handle, 2, 0x0, (int)Keys.F2);
+
             timer1_Tick(sender, e);
             timer1.Start();
         }
@@ -213,26 +228,31 @@ namespace Auto_M
 
         private void timer1_Tick(object sender, EventArgs e) // 타이머
         {
-            GetCursorPos(ref main_point);
-            X_pos.Text = main_point.X.ToString();
-            Y_pos.Text = main_point.Y.ToString();
+            GetCursorPos(ref main_point.point);
+            X_pos.Text = main_point.point.X.ToString();
+            Y_pos.Text = main_point.point.Y.ToString();
         }
 
         private void timer2_Tick(object sender, EventArgs e) // 타이머2
         {
             // 타이머 일시정지 // 1000밀리초 = 1초
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(100);
 
-            SetCursorPos(num1_point.X, num1_point.Y);
+            SetCursorPos(num1_point.point.X, num1_point.point.Y);
             mouse_event(LBUTTONDOWN, 0, 0, 0, 0);
             mouse_event(LBUTTONUP, 0, 0, 0, 0);
 
             // 타이머 일시정지
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(100);
 
-            SetCursorPos(num2_point.X, num2_point.Y);
+            SetCursorPos(num2_point.point.X, num2_point.point.Y);
             mouse_event(LBUTTONDOWN, 0, 0, 0, 0);
             mouse_event(LBUTTONUP, 0, 0, 0, 0);
+        }
+
+        private void Poslist_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            
         }
     }
 }

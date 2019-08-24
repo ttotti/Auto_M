@@ -57,6 +57,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Auto_M.hi-IN.resx">
+      <DependentUpon>Auto_M.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Auto_M.lg.resx">
+      <DependentUpon>Auto_M.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Auto_M.resx">
       <DependentUpon>Auto_M.cs</DependentUpon>
     </EmbeddedResource>

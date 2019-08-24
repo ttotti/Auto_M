@@ -8,3 +8,9 @@ C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug
 C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.csproj.CoreCompileInputs.cache
 C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.exe
 C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.pdb
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\bin\Debug\hi-IN\Auto_M.resources.dll
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\bin\Debug\lg\Auto_M.resources.dll
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.Auto_M.hi-IN.resources
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\Auto_M.Auto_M.lg.resources
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\hi-IN\Auto_M.resources.dll
+C:\Users\ttotti\Documents\Visual Studio 2017\Projects\C#\Auto_M\Auto_M\obj\Debug\lg\Auto_M.resources.dll
