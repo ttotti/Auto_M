@@ -51,6 +51,13 @@
             this.label10 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.Poslist = new System.Windows.Forms.ListBox();
+            this.delaybox = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.deletebutton = new System.Windows.Forms.Button();
+            this.label11 = new System.Windows.Forms.Label();
+            this.changebutton = new System.Windows.Forms.Button();
+            this.name_change = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // X_pos_label
@@ -114,7 +121,7 @@
             // log_Label
             // 
             this.log_Label.AutoSize = true;
-            this.log_Label.Location = new System.Drawing.Point(14, 202);
+            this.log_Label.Location = new System.Drawing.Point(14, 261);
             this.log_Label.Name = "log_Label";
             this.log_Label.Size = new System.Drawing.Size(25, 12);
             this.log_Label.TabIndex = 10;
@@ -141,7 +148,7 @@
             // 
             this.num1_X_pos.Location = new System.Drawing.Point(181, 47);
             this.num1_X_pos.Name = "num1_X_pos";
-            this.num1_X_pos.Size = new System.Drawing.Size(22, 17);
+            this.num1_X_pos.Size = new System.Drawing.Size(47, 17);
             this.num1_X_pos.TabIndex = 13;
             this.num1_X_pos.Text = "0";
             // 
@@ -157,11 +164,11 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 226);
+            this.label5.Location = new System.Drawing.Point(11, 282);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(191, 12);
+            this.label5.Size = new System.Drawing.Size(286, 12);
             this.label5.TabIndex = 15;
-            this.label5.Text = "좌표 저장 - F3    좌표 초기화 - F2";
+            this.label5.Text = "좌표 저장 - F1    좌표 선택 - F3    좌표 초기화 - F2";
             // 
             // timer2
             // 
@@ -214,7 +221,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(12, 247);
+            this.label6.Location = new System.Drawing.Point(11, 303);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(164, 12);
             this.label6.TabIndex = 21;
@@ -224,17 +231,87 @@
             // 
             this.Poslist.FormattingEnabled = true;
             this.Poslist.ItemHeight = 12;
-            this.Poslist.Location = new System.Drawing.Point(14, 101);
+            this.Poslist.Location = new System.Drawing.Point(16, 119);
             this.Poslist.Name = "Poslist";
-            this.Poslist.Size = new System.Drawing.Size(109, 88);
+            this.Poslist.Size = new System.Drawing.Size(79, 88);
+            this.Poslist.Sorted = true;
             this.Poslist.TabIndex = 22;
             this.Poslist.SelectedIndexChanged += new System.EventHandler(this.Poslist_SelectedIndexChanged);
+            // 
+            // delaybox
+            // 
+            this.delaybox.Location = new System.Drawing.Point(128, 119);
+            this.delaybox.Name = "delaybox";
+            this.delaybox.Size = new System.Drawing.Size(100, 21);
+            this.delaybox.TabIndex = 23;
+            this.delaybox.TextChanged += new System.EventHandler(this.delaybox_TextChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(128, 104);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(103, 12);
+            this.label7.TabIndex = 24;
+            this.label7.Text = "딜레이 (1/1000초)";
+            // 
+            // deletebutton
+            // 
+            this.deletebutton.Location = new System.Drawing.Point(128, 184);
+            this.deletebutton.Name = "deletebutton";
+            this.deletebutton.Size = new System.Drawing.Size(100, 23);
+            this.deletebutton.TabIndex = 25;
+            this.deletebutton.Text = "선택좌표삭제";
+            this.deletebutton.UseVisualStyleBackColor = true;
+            this.deletebutton.Click += new System.EventHandler(this.deletebutton_Click);
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(14, 104);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(81, 12);
+            this.label11.TabIndex = 26;
+            this.label11.Text = "-좌표 리스트-";
+            // 
+            // changebutton
+            // 
+            this.changebutton.Location = new System.Drawing.Point(128, 213);
+            this.changebutton.Name = "changebutton";
+            this.changebutton.Size = new System.Drawing.Size(100, 23);
+            this.changebutton.TabIndex = 27;
+            this.changebutton.Text = "이름바꾸기";
+            this.changebutton.UseVisualStyleBackColor = true;
+            this.changebutton.Click += new System.EventHandler(this.changebutton_Click);
+            // 
+            // name_change
+            // 
+            this.name_change.Location = new System.Drawing.Point(16, 213);
+            this.name_change.Name = "name_change";
+            this.name_change.Size = new System.Drawing.Size(79, 21);
+            this.name_change.TabIndex = 28;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(286, 305);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(61, 12);
+            this.label12.TabIndex = 29;
+            this.label12.Text = "-버전 4.0-";
             // 
             // Auto_M
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(355, 264);
+            this.ClientSize = new System.Drawing.Size(355, 326);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.name_change);
+            this.Controls.Add(this.changebutton);
+            this.Controls.Add(this.label11);
+            this.Controls.Add(this.deletebutton);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.delaybox);
             this.Controls.Add(this.Poslist);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.num2_Y_pos);
@@ -286,6 +363,13 @@
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label6;
         public System.Windows.Forms.ListBox Poslist;
+        private System.Windows.Forms.TextBox delaybox;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button deletebutton;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Button changebutton;
+        private System.Windows.Forms.TextBox name_change;
+        private System.Windows.Forms.Label label12;
     }
 }
 

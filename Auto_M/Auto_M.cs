@@ -11,6 +11,11 @@ using System.Windows.Forms;
 // [DllImport]를 사용하기 위해 추가한다
 using System.Runtime.InteropServices;
 
+using System.IO;
+using System.Collections;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
+
 namespace Auto_M
 {
     public partial class Auto_M : Form
@@ -41,6 +46,7 @@ namespace Auto_M
         // 대신 아래와 같이 상수를 정의한다
         const int WM_HOTKEY = 0x0312;
 
+        public const int F1 = 112;
         public const int F2 = 113;
         public const int F3 = 114;
         public const int F4 = 115;
@@ -48,21 +54,102 @@ namespace Auto_M
         public const uint LBUTTONDOWN = 0x0002;
         public const uint LBUTTONUP = 0x0004;
 
+        public const int MAX = 10;
+
         // 마우스 좌표
         // 좌표에 대한 이름을 저장하기 위해 따로 구조체를 정의하였다
         public struct Pos
         {
             public string name { get; set; }
-            public Point point;
+            public Point point_1;
+            public Point point_2;
+
+            // 생성자
+            public Pos(string name, Point point_1, Point point_2)
+            {
+                this.name = name;
+                this.point_1 = point_1;
+                this.point_2 = point_2;
+            }
         }
 
-        Pos main_point;
-        Pos origin_point;
-        Pos num1_point;
-        Pos num2_point;
+        Point main_point = new Point(0, 0);
+        Point origin_point = new Point(0, 0);
+        Pos save_point = new Pos("", new Point(0, 0), new Point(0, 0));
+
+        Pos[] list_point = new Pos[MAX];
+
+        // 딜레이
+        int delay = 1000;
 
         // 오토마우스가 실행되고 있는가
         bool isStart = false;
+
+        // 프로그램 실행 시 저장된 데이터를 불러오기 위한 코드
+        // 해쉬테이블에 데이터를 넣고 직렬화 한 후 dat 파일을 만들어서 그 안에 쓴다
+        [STAThread]
+        public void SetdatFile(object key, object Value)
+        {
+            // 사용할 데이터로는 해쉬테이블을 사용한다. 정적데이터를 사용할때에는
+            // 그냥 파일스트림에 집어넣어도 되지만
+            // 동적데이터나 컨테이너를 사용할 경우 직렬화를 반드시 해줘야하기 때문이다
+            Hashtable hashtable = new Hashtable();
+
+            hashtable.Add(key, Value);
+
+            // 직렬화 전에 파일 스트림을 오픈해준다
+            FileStream fs = new FileStream("PointList.dat", FileMode.Create);
+
+            // BinaryFormatter 는 직렬화를 해주는 역할을 한다
+            BinaryFormatter formatter = new BinaryFormatter();
+
+            try
+            {
+                formatter.Serialize(fs, hashtable);
+            }
+            catch (SerializationException e)
+            {
+                Console.WriteLine("Failed to serialize. Reason: ", e.Message);
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        // dat 파일의 데이터를 불러온다
+        public void GetdatFile()
+        {
+            // 받아올 해쉬테이블을 선언해주고
+            Hashtable hashtable = null;
+
+            // 직렬화된 파일을 오픈해 준다
+            FileStream fs = new FileStream("PointList.dat", FileMode.Open);
+            try
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+
+                // 직렬화를 해제해준다
+                hashtable = (Hashtable)formatter.Deserialize(fs);
+
+                foreach(DictionaryEntry de in hashtable)
+                {
+                    Console.WriteLine("{0}, {1}", de.Key, de.Value);
+                    Pos temp = (Pos)de.Value;
+                    Poslist.Items.Add(temp.name);
+                }
+                //Poslist.Items.Add((object)hashtable.Keys);
+            }
+            catch (SerializationException e)
+            {
+                Console.WriteLine("Failed to serialize. Reason: " + e.Message);
+                throw;
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
 
         // 윈도우 프로시저 콜백 함수
         protected override void WndProc(ref Message m)
@@ -95,25 +182,25 @@ namespace Auto_M
                         timer2.Stop();
 
                         // 원래 있던 좌표로 이동
-                        SetCursorPos(origin_point.point.X, origin_point.point.Y);
+                        SetCursorPos(origin_point.X, origin_point.Y);
                     }
                 }
                 // 눌러진 키의 ID가 1이면
                 else if (m.WParam == (IntPtr)0x1)
                 {
-                    if (num1_point.point.X == 0 && num1_point.point.Y == 0)
+                    if (save_point.point_1.X == 0 && save_point.point_1.Y == 0)
                     {
-                        num1_point = main_point;
-                        num1_X_pos.Text = num1_point.point.X.ToString();
-                        num1_Y_pos.Text = num1_point.point.Y.ToString();
+                        save_point.point_1 = main_point;
+                        num1_X_pos.Text = save_point.point_1.X.ToString();
+                        num1_Y_pos.Text = save_point.point_1.Y.ToString();
 
                         log_Label.Text = "첫 번째 좌표가 저장되었습니다!";
                     }
-                    else if (num2_point.point.X == 0 && num2_point.point.Y == 0)
+                    else if (save_point.point_2.X == 0 && save_point.point_2.Y == 0)
                     {
-                        num2_point = main_point;
-                        num2_X_pos.Text = num2_point.point.X.ToString();
-                        num2_Y_pos.Text = num2_point.point.Y.ToString();
+                        save_point.point_2 = main_point;
+                        num2_X_pos.Text = save_point.point_2.X.ToString();
+                        num2_Y_pos.Text = save_point.point_2.Y.ToString();
 
                         log_Label.Text = "두 번째 좌표가 저장되었습니다!";
                     }
@@ -121,19 +208,33 @@ namespace Auto_M
                 // 눌러진 키의 ID가 2이면
                 else if (m.WParam == (IntPtr)0x2)
                 {
-                    num1_point.point.X = 0;
-                    num1_point.point.Y = 0;
+                    save_point.point_1.X = 0;
+                    save_point.point_1.Y = 0;
 
-                    num1_X_pos.Text = num1_point.point.X.ToString();
-                    num1_Y_pos.Text = num1_point.point.Y.ToString();
+                    num1_X_pos.Text = save_point.point_1.X.ToString();
+                    num1_Y_pos.Text = save_point.point_1.Y.ToString();
 
-                    num2_point.point.X = 0;
-                    num2_point.point.Y = 0;
+                    save_point.point_2.X = 0;
+                    save_point.point_2.Y = 0;
 
-                    num2_X_pos.Text = num2_point.point.X.ToString();
-                    num2_Y_pos.Text = num2_point.point.Y.ToString();
+                    num2_X_pos.Text = save_point.point_2.X.ToString();
+                    num2_Y_pos.Text = save_point.point_2.Y.ToString();
 
                     log_Label.Text = "모든 좌표가 초기화되었습니다!";
+                }
+                else if(m.WParam == (IntPtr)0x3)
+                {
+                    int count = Poslist.Items.Count + 1;
+
+                    save_point.name = count.ToString() + "번째 좌표";
+
+                    list_point[Poslist.Items.Count] = save_point;
+
+                    Poslist.Items.Add(list_point[Poslist.Items.Count].name);
+
+                    SetdatFile(list_point[Poslist.Items.Count - 1].name, new Pos(list_point[Poslist.Items.Count - 1].name, list_point[Poslist.Items.Count - 1].point_1, list_point[Poslist.Items.Count - 1].point_2));
+
+                    log_Label.Text = "dat파일에 좌표가 저장되었습니다! 좌표가 저장되었습니다!";
                 }
             }
         }
@@ -143,26 +244,24 @@ namespace Auto_M
             InitializeComponent();
         }
 
+        // 초기화
         private void Auto_M_Load(object sender, EventArgs e)
         {
-            main_point.point.X = 0;
-            main_point.point.Y = 0;
-
-            num1_point.point.X = 0;
-            num1_point.point.Y = 0;
-
-            num2_point.point.X = 0;
-            num2_point.point.Y = 0;
-
             // 핫키를 등록
             // RegisterHotkey(핫키를 입력받을 핸들, id 값, modifer 라고 불리우는 키값(ctrl, alt, shift, winkey 등 조합키, 어떤 키를 누를지)
             // 조합키 - 0x0: 조합키안씀  |  0x1: alt  | 0x2: ctrl  |  0x3: shift
             RegisterHotKey(this.Handle, 0, 0x0, (int)Keys.F4);
             RegisterHotKey(this.Handle, 1, 0x0, (int)Keys.F3);
             RegisterHotKey(this.Handle, 2, 0x0, (int)Keys.F2);
+            RegisterHotKey(this.Handle, 3, 0x0, (int)Keys.F1);
+
+            name_change.Text = "이름입력";
+            delaybox.Text = delay.ToString();
 
             timer1_Tick(sender, e);
             timer1.Start();
+
+            GetdatFile();
         }
 
         // 핫키코드로 바꾸기 전 코드 // 키보드 이벤트 함수를 만들어서 메인폼 keyDown에 추가시킨다
@@ -228,31 +327,86 @@ namespace Auto_M
 
         private void timer1_Tick(object sender, EventArgs e) // 타이머
         {
-            GetCursorPos(ref main_point.point);
-            X_pos.Text = main_point.point.X.ToString();
-            Y_pos.Text = main_point.point.Y.ToString();
+            GetCursorPos(ref main_point);
+            X_pos.Text = main_point.X.ToString();
+            Y_pos.Text = main_point.Y.ToString();
         }
 
+        // 오토마우스 시작
         private void timer2_Tick(object sender, EventArgs e) // 타이머2
         {
             // 타이머 일시정지 // 1000밀리초 = 1초
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(delay);
 
-            SetCursorPos(num1_point.point.X, num1_point.point.Y);
+            SetCursorPos(save_point.point_1.X, save_point.point_1.Y);
             mouse_event(LBUTTONDOWN, 0, 0, 0, 0);
             mouse_event(LBUTTONUP, 0, 0, 0, 0);
 
             // 타이머 일시정지
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(delay);
 
-            SetCursorPos(num2_point.point.X, num2_point.point.Y);
+            SetCursorPos(save_point.point_2.X, save_point.point_2.Y);
             mouse_event(LBUTTONDOWN, 0, 0, 0, 0);
             mouse_event(LBUTTONUP, 0, 0, 0, 0);
         }
 
+        // 선택한 인덱스 출력
         private void Poslist_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+            if (Poslist.SelectedItem != null)  
+            {
+                save_point = list_point[Poslist.SelectedIndex];
+
+                num1_X_pos.Text = save_point.point_1.X.ToString();
+                num1_Y_pos.Text = save_point.point_1.Y.ToString();
+
+                num2_X_pos.Text = save_point.point_2.X.ToString();
+                num2_Y_pos.Text = save_point.point_2.Y.ToString();
+
+                log_Label.Text = save_point.name + "가 선택되었습니다";            
+            }
+        }
+
+        // 딜레이 설정
+        private void delaybox_TextChanged(object sender, EventArgs e)
+        {
+            if(delaybox.Text == "")
+            {
+                delaybox.Text = "0";
+            }
+
+            delay = Int32.Parse(delaybox.Text);
+        }
+
+        // 선택한 리스트 삭제
+        private void deletebutton_Click(object sender, EventArgs e)
+        {
+            Poslist.Items.RemoveAt(Poslist.SelectedIndex);
+            Poslist.Items.Remove(Poslist.SelectedIndex);
+        }
+
+        // 이름바꾸기 버튼
+        private void changebutton_Click(object sender, EventArgs e)
+        {
+            int Index = 0;
+
+            if (Poslist.SelectedItem != null)
+            {
+                Index = Poslist.SelectedIndex;
+
+                if(name_change.Text.Length != 0)
+                {
+                    list_point[Index].name = name_change.Text;
+                }
+
+                Poslist.Items.RemoveAt(Index);
+                Poslist.Items.Add(list_point[Index].name);
+                //Poslist.Items.Insert(Poslist.SelectedIndex, list_point[Poslist.SelectedIndex].name);
+            }
+            else
+            {
+                MessageBox.Show("저장되어 있는 좌표를 선택해주세요!");
+            }
         }
     }
 }
