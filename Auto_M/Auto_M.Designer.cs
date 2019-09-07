@@ -234,7 +234,6 @@
             this.Poslist.Location = new System.Drawing.Point(16, 119);
             this.Poslist.Name = "Poslist";
             this.Poslist.Size = new System.Drawing.Size(79, 88);
-            this.Poslist.Sorted = true;
             this.Poslist.TabIndex = 22;
             this.Poslist.SelectedIndexChanged += new System.EventHandler(this.Poslist_SelectedIndexChanged);
             // 
@@ -298,7 +297,7 @@
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(61, 12);
             this.label12.TabIndex = 29;
-            this.label12.Text = "-버전 4.0-";
+            this.label12.Text = "-버전 5.0-";
             // 
             // Auto_M
             // 
@@ -334,6 +333,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Auto_M";
             this.Text = "이것이 오토인지 뭔지 그런거냐?";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form_Closing);
             this.Load += new System.EventHandler(this.Auto_M_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

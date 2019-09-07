@@ -58,6 +58,8 @@ namespace Auto_M
 
         // 마우스 좌표
         // 좌표에 대한 이름을 저장하기 위해 따로 구조체를 정의하였다
+        // 직렬화 할 구조체 혹은 클래스
+        [Serializable]
         public struct Pos
         {
             public string name { get; set; }
@@ -85,18 +87,11 @@ namespace Auto_M
         // 오토마우스가 실행되고 있는가
         bool isStart = false;
 
+        List<Pos> list = new List<Pos>();
+
         // 프로그램 실행 시 저장된 데이터를 불러오기 위한 코드
-        // 해쉬테이블에 데이터를 넣고 직렬화 한 후 dat 파일을 만들어서 그 안에 쓴다
-        [STAThread]
-        public void SetdatFile(object key, object Value)
+        public void SetdatFile()
         {
-            // 사용할 데이터로는 해쉬테이블을 사용한다. 정적데이터를 사용할때에는
-            // 그냥 파일스트림에 집어넣어도 되지만
-            // 동적데이터나 컨테이너를 사용할 경우 직렬화를 반드시 해줘야하기 때문이다
-            Hashtable hashtable = new Hashtable();
-
-            hashtable.Add(key, Value);
-
             // 직렬화 전에 파일 스트림을 오픈해준다
             FileStream fs = new FileStream("PointList.dat", FileMode.Create);
 
@@ -105,7 +100,7 @@ namespace Auto_M
 
             try
             {
-                formatter.Serialize(fs, hashtable);
+                formatter.Serialize(fs, list);
             }
             catch (SerializationException e)
             {
@@ -120,34 +115,38 @@ namespace Auto_M
         // dat 파일의 데이터를 불러온다
         public void GetdatFile()
         {
-            // 받아올 해쉬테이블을 선언해주고
-            Hashtable hashtable = null;
-
-            // 직렬화된 파일을 오픈해 준다
-            FileStream fs = new FileStream("PointList.dat", FileMode.Open);
-            try
+            if(File.Exists("PointList.dat"))
             {
-                BinaryFormatter formatter = new BinaryFormatter();
+                // 직렬화된 파일을 오픈해 준다
+                FileStream fs = new FileStream("PointList.dat", FileMode.Open);
 
-                // 직렬화를 해제해준다
-                hashtable = (Hashtable)formatter.Deserialize(fs);
-
-                foreach(DictionaryEntry de in hashtable)
+                try
                 {
-                    Console.WriteLine("{0}, {1}", de.Key, de.Value);
-                    Pos temp = (Pos)de.Value;
-                    Poslist.Items.Add(temp.name);
+                    BinaryFormatter formatter = new BinaryFormatter();
+
+                    // 직렬화를 해제해준다
+                    list = (List<Pos>)formatter.Deserialize(fs);
+
+                    foreach (Pos data in list)
+                    {
+                        list_point[Poslist.Items.Count] = data;
+                        Poslist.Items.Add(list_point[Poslist.Items.Count].name);
+                        Console.WriteLine("{0}, {1} {2}", list_point[Poslist.Items.Count - 1].name, list_point[Poslist.Items.Count - 1].point_1, list_point[Poslist.Items.Count - 1].point_2);
+                    }
                 }
-                //Poslist.Items.Add((object)hashtable.Keys);
+                catch (SerializationException e)
+                {
+                    Console.WriteLine("Failed to serialize. Reason: " + e.Message);
+                    throw;
+                }
+                finally
+                {
+                    fs.Close();
+                }
             }
-            catch (SerializationException e)
+            else
             {
-                Console.WriteLine("Failed to serialize. Reason: " + e.Message);
-                throw;
-            }
-            finally
-            {
-                fs.Close();
+                Console.WriteLine("파일이 존재하지 않습니다");
             }
         }
 
@@ -224,17 +223,24 @@ namespace Auto_M
                 }
                 else if(m.WParam == (IntPtr)0x3)
                 {
-                    int count = Poslist.Items.Count + 1;
+                    if(Poslist.Items.Count < MAX)
+                    {
+                        int count = Poslist.Items.Count + 1;
 
-                    save_point.name = count.ToString() + "번째 좌표";
+                        save_point.name = count.ToString() + "번째 좌표";
 
-                    list_point[Poslist.Items.Count] = save_point;
+                        list_point[Poslist.Items.Count] = save_point;
 
-                    Poslist.Items.Add(list_point[Poslist.Items.Count].name);
+                        Poslist.Items.Add(list_point[Poslist.Items.Count].name);
 
-                    SetdatFile(list_point[Poslist.Items.Count - 1].name, new Pos(list_point[Poslist.Items.Count - 1].name, list_point[Poslist.Items.Count - 1].point_1, list_point[Poslist.Items.Count - 1].point_2));
+                        list.Add(list_point[Poslist.Items.Count - 1]);
 
-                    log_Label.Text = "dat파일에 좌표가 저장되었습니다! 좌표가 저장되었습니다!";
+                        log_Label.Text = "dat파일에 좌표가 저장되었습니다! 좌표가 저장되었습니다!";
+                    }
+                    else
+                    {
+                        log_Label.Text = "더 이상 저장할 수 없습니다!";
+                    }
                 }
             }
         }
@@ -381,8 +387,23 @@ namespace Auto_M
         // 선택한 리스트 삭제
         private void deletebutton_Click(object sender, EventArgs e)
         {
-            Poslist.Items.RemoveAt(Poslist.SelectedIndex);
-            Poslist.Items.Remove(Poslist.SelectedIndex);
+            if(Poslist.SelectedItem != null)
+            {
+                list.RemoveAt(Poslist.SelectedIndex);
+
+                // 배열의 중간을 삭제하는 것이므로 빈곳을 채우기 위해 한 칸씩 밀어서 다시 저장한다(동적 리스트를 사용하면 이럴 필요가 없다)
+                for (int index = Poslist.SelectedIndex; index < Poslist.Items.Count - 1; index++)
+                {
+                    if(index == MAX)
+                    {
+
+                    }
+                    list_point[index] = list_point[index + 1];
+                }
+
+                Poslist.Items.RemoveAt(Poslist.SelectedIndex);
+                //Poslist.Items.Remove(Poslist.SelectedIndex);
+            }
         }
 
         // 이름바꾸기 버튼
@@ -400,13 +421,21 @@ namespace Auto_M
                 }
 
                 Poslist.Items.RemoveAt(Index);
-                Poslist.Items.Add(list_point[Index].name);
-                //Poslist.Items.Insert(Poslist.SelectedIndex, list_point[Poslist.SelectedIndex].name);
+                //Poslist.Items.Remove(Index);
+                Poslist.Items.Insert(Index, list_point[Index].name);
+
+                list.RemoveAt(Index);
+                list.Insert(Index, list_point[Index]);
             }
             else
             {
                 MessageBox.Show("저장되어 있는 좌표를 선택해주세요!");
             }
+        }
+
+        private void Form_Closing(object sender, FormClosingEventArgs e)
+        {
+            SetdatFile();
         }
     }
 }
